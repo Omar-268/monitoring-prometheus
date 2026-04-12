@@ -10,10 +10,10 @@ route:
 receivers:
     - name: 'smtp'
       email_configs:
-          - smarthost: 127.0.0.1:25
-            to: 'monitor@example.com'
-            from: 'montior@example.com'
-            auth_username: 'mail'
-            auth_password: "password"
+          - smarthost: smtp.gmail.com:587
+            to: 'ALERT_RECIPIENT@gmail.com'
+            from: 'SENDER@gmail.com'
+            auth_username: 'SENDER@gmail.com'
+            auth_password: "YOUR_GMAIL_APP_PASSWORD"
             send_resolved: true
-            require_tls: false
+            require_tls: true
