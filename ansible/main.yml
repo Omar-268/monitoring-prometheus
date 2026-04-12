@@ -1,0 +1,37 @@
+---
+# ══════════════════════════════════════════════════════════════
+# main.yml — Monitor remote servers with node_exporter
+# ══════════════════════════════════════════════════════════════
+#
+# What this does:
+#   Play 1 → SSH to every server in [servers]
+#            Install node_exporter binary + systemd service
+#            Nothing else is installed or touched
+#
+# Usage
+# ──────────────────────────────────────────────
+#   # First deploy or adding new servers
+#   ansible-playbook -i inventory/hosts.ini main.yml
+#
+#   # Dry run — see what would change
+#   ansible-playbook -i inventory/hosts.ini main.yml --check --diff
+# ══════════════════════════════════════════════════════════════
+
+# ── Play 1: Install node_exporter on all remote servers ──────
+- name: Install node_exporter on remote servers
+  hosts: servers
+  gather_facts: true
+  become: true
+
+  pre_tasks:
+    - name: Ping
+      ansible.builtin.ping:
+
+  roles:
+    - role: node_exporter
+
+  post_tasks:
+    - name: Confirm node_exporter is up
+      ansible.builtin.debug:
+        msg: "✅  node_exporter running on {{ inventory_hostname }} ({{ ansible_host }}):{{ node_exporter_port }}"
+

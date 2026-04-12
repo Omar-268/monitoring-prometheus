@@ -1,0 +1,11 @@
+# ──────────────────────────────────────────────
+# group_vars/all.yml
+# ──────────────────────────────────────────────
+
+# node_exporter version to install on remote servers
+node_exporter_version: "1.8.2"
+node_exporter_port: 9100
+node_exporter_user: "node_exporter"
+node_exporter_bin_dir: "/usr/local/bin"
+
+

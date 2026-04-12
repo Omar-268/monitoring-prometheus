@@ -189,3 +189,42 @@ groups:
     annotations:
       summary: High Nginx Traffic
       description: Nginx is receiving high traffic (>100 req/sec). 
+  
+  - alert: ContainerKilled
+    expr: time() - container_last_seen{name!=""} > 60
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Container killed: {{ $labels.name }} on {{ $labels.instance }}"
+      description: |
+        Container {{ $labels.name }} (image: {{ $labels.image }}) has disappeared or stopped.
+        VALUE = {{ $value }}
+
+  - alert: ContainerHighMemoryUsage
+    expr: (
+      sum by (instance, name) (container_memory_working_set_bytes{name!=""})
+      /
+      sum by (instance, name) (container_spec_memory_limit_bytes{name!=""} > 0)) * 100 > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Container High Memory usage (instance {{ $labels.instance }})"
+      description: |
+        Container {{ $labels.name }} memory usage is above 80% of its limit.
+        VALUE = {{ $value }}
+
+  - alert: ContainerVolumeUsage
+    expr: (
+      sum by (instance, name) (container_fs_usage_bytes{name!=""})
+      /
+      sum by (instance, name) (container_fs_limit_bytes{name!=""})) * 100 > 85
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Container Volume usage is high (instance {{ $labels.instance }})"
+      description: |
+        Container {{ $labels.name }} has used more than 85% of its filesystem limits.
+        VALUE = {{ $value }}    

@@ -1,0 +1,22 @@
+[Unit]
+Description=Prometheus Node Exporter
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User={{ node_exporter_user }}
+Group={{ node_exporter_user }}
+Type=simple
+Restart=on-failure
+RestartSec=5s
+ExecStart={{ node_exporter_bin_dir }}/node_exporter \
+  --web.listen-address=":{{ node_exporter_port }}" \
+  --collector.filesystem.mount-points-exclude='^/(sys|proc|dev|run)($$|/)'
+
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

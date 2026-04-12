@@ -1,0 +1,2537 @@
+{
+    "__inputs": [
+        {
+            "name": "DS_WAZUH",
+            "label": "WAZUH",
+            "description": "OpenSearch datasource pointing at wazuh-alerts-*",
+            "type": "datasource",
+            "pluginId": "grafana-opensearch-datasource",
+            "pluginName": "OpenSearch"
+        }
+    ],
+    "__requires": [
+        {
+            "type": "grafana",
+            "id": "grafana",
+            "name": "Grafana",
+            "version": "10.0.0"
+        },
+        {
+            "type": "datasource",
+            "id": "grafana-opensearch-datasource",
+            "name": "OpenSearch",
+            "version": "2.0.0"
+        },
+        {
+            "type": "panel",
+            "id": "stat",
+            "name": "Stat",
+            "version": ""
+        },
+        {
+            "type": "panel",
+            "id": "timeseries",
+            "name": "Time series",
+            "version": ""
+        },
+        {
+            "type": "panel",
+            "id": "barchart",
+            "name": "Bar chart",
+            "version": ""
+        },
+        {
+            "type": "panel",
+            "id": "table",
+            "name": "Table",
+            "version": ""
+        },
+        {
+            "type": "panel",
+            "id": "logs",
+            "name": "Logs",
+            "version": ""
+        },
+        {
+            "type": "panel",
+            "id": "piechart",
+            "name": "Pie chart",
+            "version": ""
+        }
+    ],
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": {
+                    "type": "grafana",
+                    "uid": "-- Grafana --"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "description": "Wazuh Security Monitoring Dashboard — connects directly to the Wazuh Indexer via the OpenSearch datasource plugin. Shows total alerts, severity breakdown, alert trend, top agents, top rules, security use-cases, IP enrichment, EPS metrics, and raw log explorer.",
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 1,
+    "id": null,
+    "links": [],
+    "panels": [
+        {
+            "collapsed": false,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 0
+            },
+            "id": 100,
+            "title": "Overview",
+            "type": "row"
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Total number of alerts in the selected time range",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "yellow",
+                                "value": 100
+                            },
+                            {
+                                "color": "red",
+                                "value": 500
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 0,
+                "y": 1
+            },
+            "id": 1,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "sum"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "title": "Total Alerts",
+            "type": "stat",
+            "targets": [
+                {
+                    "alias": "Total Alerts",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Alerts with rule level >= 12 (critical severity)",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "red"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 1
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 4,
+                "y": 1
+            },
+            "id": 2,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "sum"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "title": "Critical Alerts (Level >= 12)",
+            "type": "stat",
+            "targets": [
+                {
+                    "alias": "Critical",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "rule.level:>=12 AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Alerts with rule level 7-11 (high severity)",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "orange"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "orange",
+                                "value": 1
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 8,
+                "y": 1
+            },
+            "id": 3,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "sum"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "title": "High Alerts (Level 7-11)",
+            "type": "stat",
+            "targets": [
+                {
+                    "alias": "High",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "rule.level:[7 TO 11] AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Number of unique agents that generated alerts in this time range",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "blue"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 12,
+                "y": 1
+            },
+            "id": 4,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "sum"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "title": "Active Agents",
+            "type": "stat",
+            "targets": [
+                {
+                    "alias": "Agents",
+                    "bucketAggs": [
+                        {
+                            "field": "agent.name",
+                            "id": "2",
+                            "settings": {
+                                "min_doc_count": "1",
+                                "order": "desc",
+                                "orderBy": "1",
+                                "size": "500"
+                            },
+                            "type": "terms"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                }
+            ],
+            "transformations": [
+                {
+                    "id": "reduce",
+                    "options": {
+                        "reducers": [
+                            "count"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Number of unique rules that fired in this time range",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "purple"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 16,
+                "y": 1
+            },
+            "id": 5,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "sum"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "title": "Unique Rules Fired",
+            "type": "stat",
+            "targets": [
+                {
+                    "alias": "Rules",
+                    "bucketAggs": [
+                        {
+                            "field": "rule.id",
+                            "id": "2",
+                            "settings": {
+                                "min_doc_count": "1",
+                                "order": "desc",
+                                "orderBy": "1",
+                                "size": "500"
+                            },
+                            "type": "terms"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                }
+            ],
+            "transformations": [
+                {
+                    "id": "reduce",
+                    "options": {
+                        "reducers": [
+                            "count"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Alerts per second (EPS) — event rate over time",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "semi-dark-blue"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 20,
+                "y": 1
+            },
+            "id": 6,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "area",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "mean"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "title": "Avg Alerts / Min (EPS)",
+            "type": "stat",
+            "targets": [
+                {
+                    "alias": "EPS",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "1m",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                }
+            ]
+        },
+        {
+            "collapsed": false,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 5
+            },
+            "id": 101,
+            "title": "Alert Trend",
+            "type": "row"
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Number of alerts over time, split by severity level group",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "Alert Count",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "bars",
+                        "fillOpacity": 70,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "never",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "normal"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Critical (>=12)"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "red",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "High (7-11)"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "orange",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Medium (4-6)"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "yellow",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Low (1-3)"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "green",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 18,
+                "x": 0,
+                "y": 6
+            },
+            "id": 10,
+            "options": {
+                "legend": {
+                    "calcs": [
+                        "sum"
+                    ],
+                    "displayMode": "table",
+                    "placement": "right",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "multi",
+                    "sort": "desc"
+                }
+            },
+            "title": "Alert Volume Over Time (by Severity)",
+            "type": "timeseries",
+            "targets": [
+                {
+                    "alias": "Critical (>=12)",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "rule.level:>=12 AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                },
+                {
+                    "alias": "High (7-11)",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "rule.level:[7 TO 11] AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "B",
+                    "timeField": "timestamp"
+                },
+                {
+                    "alias": "Medium (4-6)",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "rule.level:[4 TO 6] AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "C",
+                    "timeField": "timestamp"
+                },
+                {
+                    "alias": "Low (1-3)",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "rule.level:[1 TO 3] AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "D",
+                    "timeField": "timestamp"
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Alerts per minute trend (EPS). Shows the event rate over the selected time window.",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "semi-dark-blue"
+                    },
+                    "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "Alerts/min",
+                        "axisPlacement": "auto",
+                        "drawStyle": "line",
+                        "fillOpacity": 20,
+                        "gradientMode": "opacity",
+                        "lineInterpolation": "smooth",
+                        "lineWidth": 2,
+                        "pointSize": 4,
+                        "showPoints": "never",
+                        "spanNulls": true,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 18,
+                "y": 6
+            },
+            "id": 11,
+            "options": {
+                "legend": {
+                    "displayMode": "hidden",
+                    "placement": "bottom",
+                    "showLegend": false
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "title": "Alerts Per Minute (EPS Trend)",
+            "type": "timeseries",
+            "targets": [
+                {
+                    "alias": "Alerts/min",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "1m",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                }
+            ]
+        },
+        {
+            "collapsed": false,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 14
+            },
+            "id": 102,
+            "title": "Top Sources",
+            "type": "row"
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "The 10 agents that generated the most alerts in the selected time range",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "fillOpacity": 80,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "lineWidth": 1,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 15
+            },
+            "id": 20,
+            "options": {
+                "barRadius": 0.1,
+                "barWidth": 0.6,
+                "fullHighlight": false,
+                "groupWidth": 0.7,
+                "legend": {
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": false
+                },
+                "orientation": "horizontal",
+                "showValue": "always",
+                "stacking": "none",
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xTickLabelRotation": 0,
+                "xTickLabelSpacing": 200
+            },
+            "title": "Top 10 Agents by Alert Count",
+            "type": "barchart",
+            "targets": [
+                {
+                    "alias": "",
+                    "bucketAggs": [
+                        {
+                            "field": "agent.name",
+                            "id": "2",
+                            "settings": {
+                                "min_doc_count": "1",
+                                "order": "desc",
+                                "orderBy": "1",
+                                "size": "10"
+                            },
+                            "type": "terms"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Distribution of alerts by severity level across all agents",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        }
+                    },
+                    "mappings": [],
+                    "unit": "short"
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Critical (>=12)"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "red",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "High (7-11)"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "orange",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Medium (4-6)"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "yellow",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Low (1-3)"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "green",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 12,
+                "y": 15
+            },
+            "id": 21,
+            "options": {
+                "displayLabels": [
+                    "percent"
+                ],
+                "legend": {
+                    "displayMode": "table",
+                    "placement": "bottom",
+                    "showLegend": true,
+                    "values": [
+                        "percent",
+                        "value"
+                    ]
+                },
+                "pieType": "donut",
+                "reduceOptions": {
+                    "calcs": [
+                        "sum"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "title": "Alerts by Severity",
+            "type": "piechart",
+            "targets": [
+                {
+                    "alias": "Critical (>=12)",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "rule.level:>=12 AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                },
+                {
+                    "alias": "High (7-11)",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "rule.level:[7 TO 11] AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "B",
+                    "timeField": "timestamp"
+                },
+                {
+                    "alias": "Medium (4-6)",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "rule.level:[4 TO 6] AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "C",
+                    "timeField": "timestamp"
+                },
+                {
+                    "alias": "Low (1-3)",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "rule.level:[1 TO 3] AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "D",
+                    "timeField": "timestamp"
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Top rule groups that fired most often",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "purple"
+                    },
+                    "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "fillOpacity": 80,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "lineWidth": 1,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 18,
+                "y": 15
+            },
+            "id": 22,
+            "options": {
+                "barRadius": 0.1,
+                "barWidth": 0.6,
+                "fullHighlight": false,
+                "groupWidth": 0.7,
+                "legend": {
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": false
+                },
+                "orientation": "horizontal",
+                "showValue": "always",
+                "stacking": "none",
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xTickLabelRotation": 0,
+                "xTickLabelSpacing": 200
+            },
+            "title": "Top Rule Groups",
+            "type": "barchart",
+            "targets": [
+                {
+                    "alias": "",
+                    "bucketAggs": [
+                        {
+                            "field": "rule.groups",
+                            "id": "2",
+                            "settings": {
+                                "min_doc_count": "1",
+                                "order": "desc",
+                                "orderBy": "1",
+                                "size": "8"
+                            },
+                            "type": "terms"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                }
+            ]
+        },
+        {
+            "collapsed": false,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 23
+            },
+            "id": 105,
+            "title": "Security Use Cases",
+            "type": "row"
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Authentication failure events over time — high spikes may indicate brute force attempts",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "red"
+                    },
+                    "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "Count",
+                        "axisPlacement": "auto",
+                        "drawStyle": "bars",
+                        "fillOpacity": 60,
+                        "gradientMode": "none",
+                        "lineWidth": 1,
+                        "showPoints": "never",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 0,
+                "y": 24
+            },
+            "id": 50,
+            "options": {
+                "legend": {
+                    "calcs": [
+                        "sum"
+                    ],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "title": "Authentication Failures Over Time",
+            "type": "timeseries",
+            "targets": [
+                {
+                    "alias": "Auth Failures",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "rule.groups:authentication_failed AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                },
+                {
+                    "alias": "SSH Brute Force",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "rule.groups:authentication_failures AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "B",
+                    "timeField": "timestamp"
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Security-specific event counts by attack category",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "yellow",
+                                "value": 1
+                            },
+                            {
+                                "color": "red",
+                                "value": 10
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 12,
+                "y": 24
+            },
+            "id": 51,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                    "calcs": [
+                        "sum"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "title": "Security Event Counters",
+            "type": "stat",
+            "targets": [
+                {
+                    "alias": "Auth Failures",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "rule.groups:authentication_failed AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                },
+                {
+                    "alias": "Privilege Escalation",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "rule.groups:sudo AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "B",
+                    "timeField": "timestamp"
+                },
+                {
+                    "alias": "Web Attacks",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "rule.groups:web AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "C",
+                    "timeField": "timestamp"
+                },
+                {
+                    "alias": "Malware Detected",
+                    "bucketAggs": [
+                        {
+                            "field": "timestamp",
+                            "id": "2",
+                            "settings": {
+                                "interval": "auto",
+                                "min_doc_count": "0",
+                                "trimEdges": "0"
+                            },
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "rule.groups:virus AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "D",
+                    "timeField": "timestamp"
+                }
+            ]
+        },
+        {
+            "collapsed": false,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 31
+            },
+            "id": 106,
+            "title": "IP Enrichment",
+            "type": "row"
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Top source IPs generating alerts — potential attackers or misconfigured hosts",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "auto",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "filterable": true,
+                        "inspect": false
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "yellow",
+                                "value": 10
+                            },
+                            {
+                                "color": "orange",
+                                "value": 50
+                            },
+                            {
+                                "color": "red",
+                                "value": 100
+                            }
+                        ]
+                    }
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Count"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.width",
+                                "value": 80
+                            },
+                            {
+                                "id": "custom.cellOptions",
+                                "value": {
+                                    "mode": "gradient",
+                                    "type": "color-background"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "source.ip"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.width",
+                                "value": 160
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "geoip.country_name"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.width",
+                                "value": 160
+                            }
+                        ]
+                    }
+                ]
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 32
+            },
+            "id": 60,
+            "options": {
+                "cellHeight": "sm",
+                "footer": {
+                    "countRows": false,
+                    "fields": "",
+                    "reducer": [
+                        "sum"
+                    ],
+                    "show": false
+                },
+                "showHeader": true,
+                "sortBy": [
+                    {
+                        "desc": true,
+                        "displayName": "Count"
+                    }
+                ]
+            },
+            "title": "Top Attacking Source IPs",
+            "type": "table",
+            "targets": [
+                {
+                    "alias": "",
+                    "bucketAggs": [
+                        {
+                            "field": "data.srcip",
+                            "id": "3",
+                            "settings": {
+                                "min_doc_count": "1",
+                                "order": "desc",
+                                "orderBy": "1",
+                                "size": "15"
+                            },
+                            "type": "terms"
+                        },
+                        {
+                            "field": "GeoLocation.country_name",
+                            "id": "4",
+                            "settings": {
+                                "min_doc_count": "1",
+                                "order": "desc",
+                                "orderBy": "1",
+                                "size": "1"
+                            },
+                            "type": "terms"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "data.srcip:* AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Top countries from which attacks originate (based on GeoIP data)",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "fillOpacity": 80,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "lineWidth": 1,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 32
+            },
+            "id": 61,
+            "options": {
+                "barRadius": 0.1,
+                "barWidth": 0.6,
+                "fullHighlight": false,
+                "groupWidth": 0.7,
+                "legend": {
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": false
+                },
+                "orientation": "horizontal",
+                "showValue": "always",
+                "stacking": "none",
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                },
+                "xTickLabelRotation": 0,
+                "xTickLabelSpacing": 200
+            },
+            "title": "Top Attack Countries (GeoIP)",
+            "type": "barchart",
+            "targets": [
+                {
+                    "alias": "",
+                    "bucketAggs": [
+                        {
+                            "field": "GeoLocation.country_name",
+                            "id": "2",
+                            "settings": {
+                                "min_doc_count": "1",
+                                "order": "desc",
+                                "orderBy": "1",
+                                "size": "10"
+                            },
+                            "type": "terms"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "GeoLocation.country_name:* AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                }
+            ]
+        },
+        {
+            "collapsed": false,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 40
+            },
+            "id": 103,
+            "title": "Top Rules and Agents Table",
+            "type": "row"
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Top 15 rules sorted by alert count. Shows rule ID, description, level, and total count.",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "auto",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "filterable": true,
+                        "inspect": false
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "yellow",
+                                "value": 10
+                            },
+                            {
+                                "color": "orange",
+                                "value": 50
+                            },
+                            {
+                                "color": "red",
+                                "value": 100
+                            }
+                        ]
+                    }
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Count"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.width",
+                                "value": 80
+                            },
+                            {
+                                "id": "custom.cellOptions",
+                                "value": {
+                                    "mode": "gradient",
+                                    "type": "color-background"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "rule.description"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.width",
+                                "value": 380
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "rule.id"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.width",
+                                "value": 80
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "rule.level"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.width",
+                                "value": 80
+                            }
+                        ]
+                    }
+                ]
+            },
+            "gridPos": {
+                "h": 10,
+                "w": 14,
+                "x": 0,
+                "y": 41
+            },
+            "id": 30,
+            "options": {
+                "cellHeight": "sm",
+                "footer": {
+                    "countRows": false,
+                    "fields": "",
+                    "reducer": [
+                        "sum"
+                    ],
+                    "show": false
+                },
+                "showHeader": true,
+                "sortBy": [
+                    {
+                        "desc": true,
+                        "displayName": "Count"
+                    }
+                ]
+            },
+            "title": "Top 15 Triggered Rules",
+            "type": "table",
+            "targets": [
+                {
+                    "alias": "",
+                    "bucketAggs": [
+                        {
+                            "field": "rule.id",
+                            "id": "3",
+                            "settings": {
+                                "min_doc_count": "1",
+                                "order": "desc",
+                                "orderBy": "1",
+                                "size": "15"
+                            },
+                            "type": "terms"
+                        },
+                        {
+                            "field": "rule.description",
+                            "id": "4",
+                            "settings": {
+                                "min_doc_count": "1",
+                                "order": "desc",
+                                "orderBy": "1",
+                                "size": "1"
+                            },
+                            "type": "terms"
+                        },
+                        {
+                            "field": "rule.level",
+                            "id": "5",
+                            "settings": {
+                                "min_doc_count": "1",
+                                "order": "desc",
+                                "orderBy": "1",
+                                "size": "1"
+                            },
+                            "type": "terms"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Top 10 agents with the most alerts, showing alert count per agent",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "auto",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "filterable": true,
+                        "inspect": false
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "yellow",
+                                "value": 50
+                            },
+                            {
+                                "color": "orange",
+                                "value": 200
+                            },
+                            {
+                                "color": "red",
+                                "value": 500
+                            }
+                        ]
+                    }
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Count"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.width",
+                                "value": 100
+                            },
+                            {
+                                "id": "custom.cellOptions",
+                                "value": {
+                                    "mode": "gradient",
+                                    "type": "color-background"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "agent.name"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.width",
+                                "value": 180
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "agent.ip"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.width",
+                                "value": 130
+                            }
+                        ]
+                    }
+                ]
+            },
+            "gridPos": {
+                "h": 10,
+                "w": 10,
+                "x": 14,
+                "y": 41
+            },
+            "id": 31,
+            "options": {
+                "cellHeight": "sm",
+                "footer": {
+                    "countRows": false,
+                    "fields": "",
+                    "reducer": [
+                        "sum"
+                    ],
+                    "show": false
+                },
+                "showHeader": true,
+                "sortBy": [
+                    {
+                        "desc": true,
+                        "displayName": "Count"
+                    }
+                ]
+            },
+            "title": "Top 10 Agents",
+            "type": "table",
+            "targets": [
+                {
+                    "alias": "",
+                    "bucketAggs": [
+                        {
+                            "field": "agent.name",
+                            "id": "3",
+                            "settings": {
+                                "min_doc_count": "1",
+                                "order": "desc",
+                                "orderBy": "1",
+                                "size": "10"
+                            },
+                            "type": "terms"
+                        },
+                        {
+                            "field": "agent.ip",
+                            "id": "4",
+                            "settings": {
+                                "min_doc_count": "1",
+                                "order": "desc",
+                                "orderBy": "1",
+                                "size": "1"
+                            },
+                            "type": "terms"
+                        }
+                    ],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "type": "count"
+                        }
+                    ],
+                    "query": "agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                }
+            ]
+        },
+        {
+            "collapsed": false,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 51
+            },
+            "id": 104,
+            "title": "Raw Log Explorer",
+            "type": "row"
+        },
+        {
+            "datasource": {
+                "type": "grafana-opensearch-datasource",
+                "uid": "wazuh-opensearch"
+            },
+            "description": "Live scrollable log view filtered by selected agent and rule group variables. Use the Lucene query to refine further. Predefined filter examples: rule.groups:authentication_failed | rule.groups:virus | rule.groups:web | agent.name:server-01",
+            "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 12,
+                "w": 24,
+                "x": 0,
+                "y": 52
+            },
+            "id": 40,
+            "options": {
+                "dedupStrategy": "none",
+                "enableLogDetails": true,
+                "prettifyLogMessage": false,
+                "showCommonLabels": false,
+                "showLabels": false,
+                "showTime": true,
+                "sortOrder": "Descending",
+                "wrapLogMessage": true
+            },
+            "title": "Raw Alert Logs",
+            "type": "logs",
+            "targets": [
+                {
+                    "alias": "",
+                    "bucketAggs": [],
+                    "datasource": {
+                        "type": "grafana-opensearch-datasource",
+                        "uid": "wazuh-opensearch"
+                    },
+                    "metrics": [
+                        {
+                            "id": "1",
+                            "settings": {
+                                "limit": "500"
+                            },
+                            "type": "logs"
+                        }
+                    ],
+                    "query": "rule.level:>=3 AND agent.name:${agent:lucene} AND rule.groups:${rule_group:lucene}",
+                    "refId": "A",
+                    "timeField": "timestamp"
+                }
+            ]
+        }
+    ],
+    "refresh": "30s",
+    "schemaVersion": 38,
+    "tags": [
+        "wazuh",
+        "security",
+        "siem",
+        "opensearch"
+    ],
+    "templating": {
+        "list": [
+            {
+                "current": {
+                    "selected": true,
+                    "text": "All",
+                    "value": "$__all"
+                },
+                "datasource": {
+                    "type": "grafana-opensearch-datasource",
+                    "uid": "wazuh-opensearch"
+                },
+                "definition": "{\"find\": \"terms\", \"field\": \"agent.name\", \"size\": 500}",
+                "hide": 0,
+                "includeAll": true,
+                "allValue": "*",
+                "label": "Agent",
+                "multi": true,
+                "name": "agent",
+                "options": [],
+                "query": "{\"find\": \"terms\", \"field\": \"agent.name\", \"size\": 500}",
+                "refresh": 2,
+                "regex": "",
+                "sort": 1,
+                "type": "query"
+            },
+            {
+                "current": {
+                    "selected": true,
+                    "text": "All",
+                    "value": "$__all"
+                },
+                "datasource": {
+                    "type": "grafana-opensearch-datasource",
+                    "uid": "wazuh-opensearch"
+                },
+                "definition": "{\"find\": \"terms\", \"field\": \"rule.groups\", \"size\": 500}",
+                "hide": 0,
+                "includeAll": true,
+                "allValue": "*",
+                "label": "Rule Group",
+                "multi": true,
+                "name": "rule_group",
+                "options": [],
+                "query": "{\"find\": \"terms\", \"field\": \"rule.groups\", \"size\": 500}",
+                "refresh": 2,
+                "regex": "",
+                "sort": 1,
+                "type": "query"
+            },
+            {
+                "current": {
+                    "selected": true,
+                    "text": "All",
+                    "value": "$__all"
+                },
+                "datasource": {
+                    "type": "grafana-opensearch-datasource",
+                    "uid": "wazuh-opensearch"
+                },
+                "definition": "{\"find\": \"terms\", \"field\": \"rule.level\", \"size\": 20}",
+                "hide": 0,
+                "includeAll": true,
+                "allValue": "*",
+                "label": "Min Level",
+                "multi": false,
+                "name": "min_level",
+                "options": [],
+                "query": "{\"find\": \"terms\", \"field\": \"rule.level\", \"size\": 20}",
+                "refresh": 2,
+                "regex": "",
+                "sort": 3,
+                "type": "query"
+            }
+        ]
+    },
+    "time": {
+        "from": "now-24h",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "Wazuh Security Overview - Fully Fixed V5",
+    "uid": "wazuh-security-overview-fully-fixed-v5",
+    "version": 5
+}
