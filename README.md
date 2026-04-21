@@ -4,7 +4,7 @@ A production-style monitoring stack built with **Prometheus**, **Grafana**, **Al
 
 ---
 
-## 🧩 Stack Components
+##  Stack Components
 
 | Service | Port | Description |
 |---------|------|-------------|
@@ -21,7 +21,7 @@ A production-style monitoring stack built with **Prometheus**, **Grafana**, **Al
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
 - **Host Monitoring** — CPU, memory, disk, and network via Node Exporter (local + remote VMs + EC2)
 - **Container Observability** — Per-container CPU/RAM/network via cAdvisor
@@ -38,7 +38,7 @@ A production-style monitoring stack built with **Prometheus**, **Grafana**, **Al
 
 ---
 
-## 📊 Grafana Dashboards
+##  Grafana Dashboards
 
 | Dashboard | Description |
 |-----------|-------------|
@@ -56,7 +56,7 @@ All dashboards are auto-provisioned on stack startup from `grafana/dashboards/`.
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Docker & Docker Compose
@@ -135,7 +135,7 @@ docker compose up -d
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 monitor-containers/
@@ -165,6 +165,6 @@ monitor-containers/
 
 ---
 
-## 📜 License
+##  License
 
 MIT — see [LICENSE](LICENSE)
